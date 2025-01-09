@@ -11,14 +11,19 @@ pub struct Matrix<let M: u32, let N: u32, T> {
     pub data: [[T; N]; M],
 }
 
+// Matrix trait defining common matrix operations
 pub trait MatrixTrait<let M: u32, let N: u32, let K: u32, T>: Add + Sub 
 where 
     T: Add + Sub + Mul + Default,
 {
+    // Creates a new matrix with all elements set to the default
     pub fn new() -> Self;
+    // Multiplies the matrix by a scalar
     pub fn scalar_mult(self: Self, k: T) -> Self;
     // Multiply m x n matrix with a n x k matrix, resulting in a m x n matrix
     pub fn mult(self: Self, other: Matrix<N, K, T>) -> Matrix<M, K, T>;
+    // Transposes the matrix from M x N to N x M
+    pub fn transpose(self) -> Matrix<N, M, T>;
 }
 
 impl<let M: u32, let N: u32, let K: u32, T> MatrixTrait<M, N, K, T> for Matrix<M, N, T>
@@ -53,6 +58,41 @@ where
         }
         res
     }
+
+    pub fn transpose(self) -> Matrix<N, M, T> {
+        let mut res = Matrix { data: [[T::default(); M]; N] };
+        for i in 0..M {
+            for j in 0..N {
+                res.data[j][i] = self.data[i][j];
+            }
+        }
+        res
+    }
+}
+
+// Computes the trace of a square matrix (sum of diagonal elements)
+// Note: this is only available for square matrices
+fn trace<let N: u32, T>(matrix: Matrix<N, N, T>) -> T 
+where 
+  T: Default + Add
+{
+    let mut sum = T::default();
+    for i in 0..N {
+        sum += matrix.data[i][i];
+    }
+    sum
+}
+
+// Computes the dot product of two vectors (sum of the elementwise multiplication of their components)
+fn dot_product<let N: u32, T>(u: [T; N], v: [T; N]) -> T
+where
+  T: Default + Add + Mul
+ {
+    let mut result = T::default();
+    for i in 0..N {
+        result += u[i] * v[i];
+    }
+    result
 }
 
 impl<let M: u32, let N: u32, T> Add for Matrix<M, N, T> 
@@ -248,4 +288,76 @@ fn test_matrix_multiplication_different_sizes() {
     assert(result_identity.data[1][0] == 4);
     assert(result_identity.data[1][1] == 5);
     assert(result_identity.data[1][2] == 6);
+}
+
+#[test]
+fn test_matrix_transpose() {
+    let a: Matrix<2, 3, Field> = Matrix {
+        data: [[1, 2, 3], [4, 5, 6]],
+    };
+    let transposed = a.transpose();
+    // Expected: [[1, 4], [2, 5], [3, 6]]
+    assert(transposed.data[0][0] == 1);
+    assert(transposed.data[0][1] == 4);
+    assert(transposed.data[1][0] == 2);
+    assert(transposed.data[1][1] == 5);
+    assert(transposed.data[2][0] == 3);
+    assert(transposed.data[2][1] == 6);
+}
+
+#[test]
+fn test_dot_product() {
+    // Test 1: Two 3-element vectors
+    let u: [Field; 3] = [1, 2, 3];
+    let v: [Field; 3] = [4, 5, 6];
+    let result = dot_product(u, v);
+    assert(result == 32); // (1*4) + (2*5) + (3*6) = 32
+
+    // Test 2: Orthogonal vectors
+    let u_ortho: [Field; 3] = [1, 0, 0];
+    let v_ortho: [Field; 3] = [0, 1, 0];
+    let result_ortho = dot_product(u_ortho, v_ortho);
+    assert(result_ortho == 0); // Orthogonal vectors have a dot product of 0
+
+    // Test 3: Vector with itself
+    let u_self: [Field; 3] = [2, 3, 4];
+    let result_self = dot_product(u_self, u_self);
+    assert(result_self == 29); // (2*2) + (3*3) + (4*4) = 29
+
+    // Test 4: Zero vector
+    let zero: [Field; 3] = [0, 0, 0];
+    let v_any: [Field; 3] = [7, 8, 9];
+    let result_zero = dot_product(zero, v_any);
+    assert(result_zero == 0); // Dot product with zero vector is always 0
+}
+
+#[test]
+fn test_trace() {
+    // Test 1: Trace of a 3x3 matrix
+    let matrix_3x3: Matrix<3, 3, Field> = Matrix {
+        data: [[1, 2, 3], [4, 5, 6], [7, 8, 9]],
+    };
+    let result = trace(matrix_3x3);
+    assert(result == 15); // 1 + 5 + 9 = 15
+
+    // Test 2: Trace of a 2x2 matrix
+    let matrix_2x2: Matrix<2, 2, Field> = Matrix {
+        data: [[10, 20], [30, 40]],
+    };
+    let result_2x2 = trace(matrix_2x2);
+    assert(result_2x2 == 50); // 10 + 40 = 50
+
+    // Test 3: Trace of a zero matrix
+    let zero_matrix: Matrix<3, 3, Field> = Matrix {
+        data: [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+    };
+    let result_zero = trace(zero_matrix);
+    assert(result_zero == 0); // Sum of diagonal elements = 0
+
+    // Test 4: Trace of an identity matrix
+    let identity_matrix: Matrix<3, 3, Field> = Matrix {
+        data: [[1, 0, 0], [0, 1, 0], [0, 0, 1]],
+    };
+    let result_identity = trace(identity_matrix);
+    assert(result_identity == 3); // Sum of diagonal elements = 1 + 1 + 1 = 3
 }
