@@ -36,3 +36,19 @@ let u = [1, 2, 3];
 let v = [4, 5, 6];
 let dot = dot_product(u, v); // Result: 32
 ```
+
+## Benchmarks 
+
+Addition, subtraction, scalar multiplication have equal costs:
+- 50x50 matrix: 2.516 gates
+- 100x100 matrix: 10.016 gates
+
+Dot product for two vectors of 100 entries: 100 gates. Trace of a 100x100 matrix: 50 gates. 
+
+Matrix multiplication:
+- 50x30 x 30x60: 90.016 gates
+- 50x50: 125.016 gates
+- 100x100: 1.000.016 gates
+- 100x120 x 120x110: 1.320.016 gates
+
+Rerun benchmarks in folder `benchmarks`.

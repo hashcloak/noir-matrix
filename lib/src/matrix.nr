@@ -72,7 +72,7 @@ where
 
 // Computes the trace of a square matrix (sum of diagonal elements)
 // Note: this is only available for square matrices
-fn trace<let N: u32, T>(matrix: Matrix<N, N, T>) -> T 
+pub fn trace<let N: u32, T>(matrix: Matrix<N, N, T>) -> T 
 where 
   T: Default + Add
 {
@@ -84,7 +84,7 @@ where
 }
 
 // Computes the dot product of two vectors (sum of the elementwise multiplication of their components)
-fn dot_product<let N: u32, T>(u: [T; N], v: [T; N]) -> T
+pub fn dot_product<let N: u32, T>(u: [T; N], v: [T; N]) -> T
 where
   T: Default + Add + Mul
  {
