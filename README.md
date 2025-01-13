@@ -52,3 +52,5 @@ Matrix multiplication:
 - 100x120 x 120x110: 1.320.016 gates
 
 Rerun benchmarks in folder `benchmarks`.
+- Nargo `1.0.0-beta.0`
+- bb `0.63.0`

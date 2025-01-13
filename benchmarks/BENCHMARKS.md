@@ -13,6 +13,9 @@ The last command can be helpful when the gatecount is high and the output to the
 
 ## Output (Jan 2025)
 
+- Nargo `1.0.0-beta.0`
+- bb `0.63.0`
+
 Addition, subtraction, scalar multiplication have equal costs:
 - 50x50 matrix: 2.516 gates
 - 100x100 matrix: 10.016 gates
